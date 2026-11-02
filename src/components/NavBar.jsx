@@ -95,7 +95,7 @@ const NavBar = ({ drawerWidth = 280, children }) => {
       
       <Box sx={{ overflow: 'auto', pt: 2 }}>
         <List sx={{ px: 1 }}>
-          {menuItems.map((item, index) => (
+          {menuItems.map((item) => (
             <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
               <ListItemButton 
                 component={RouterLink} 

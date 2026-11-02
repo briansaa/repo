@@ -4,7 +4,7 @@ import {
   Typography, Container, Alert, MenuItem, Grid, Link
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import axios from 'axios';
+import AxiosInstance from '../Axios';
 import { Link as RouterLink } from 'react-router-dom';  // Importar Link de react-router-dom
 
 const Register = () => {
@@ -18,11 +18,11 @@ const Register = () => {
   const [severity, setSeverity] = useState('error');
 
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/roles/')
+    AxiosInstance.get('roles/')
       .then((res) => {
         setListaRoles(res.data);
         if (res.data.length > 0) {
-          setRol(res.data[0].id_rol);
+          setRol(res.data[0]);
         }
       })
       .catch((err) => {
@@ -41,7 +41,7 @@ const Register = () => {
     }
 
     try {
-      await axios.post('http://127.0.0.1:8000/usuarios/', {
+      await AxiosInstance.post('usuarios/', {
         correo,
         nombre_usuario,
         password: contraseña,  // Asegúrate de enviar "password" en lugar de "contraseña"
@@ -54,9 +54,10 @@ const Register = () => {
       setNombreUsuario('');
       setContraseña('');
       setConfirmContraseña('');
-      setRol(listaRoles[0]?.id_rol || '');
+      setRol(listaRoles[0] || '');
     } catch (error) {
-      const errMsg = error?.response?.data?.detail || 'Error al registrar el usuario';
+      const data = error?.response?.data;
+      const errMsg = data?.detail || (data && Object.values(data).flat()[0]) || 'Error al registrar el usuario';
       setMessage(errMsg);
       setSeverity('error');
     }
@@ -116,8 +117,8 @@ const Register = () => {
             required
           >
             {listaRoles.map((r) => (
-              <MenuItem key={r.id_rol} value={r.id_rol}>
-                {r.rol} ({r.permiso})
+              <MenuItem key={r} value={r}>
+                {r.charAt(0).toUpperCase() + r.slice(1)}
               </MenuItem>
             ))}
           </TextField>

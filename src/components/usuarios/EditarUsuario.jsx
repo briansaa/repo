@@ -18,7 +18,7 @@ const EditarUsuario = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [roles, setRoles] = useState([]);
-  const [usuario, setUsuario] = useState(null);
+  const [, setUsuario] = useState(null);
 
   const defaultValues = {
     nombre_usuario: '',

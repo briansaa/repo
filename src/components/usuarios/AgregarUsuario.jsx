@@ -43,7 +43,7 @@ const AgregarUsuario = () => {
       .then((res) => {
         setRoles(res.data);
       })
-      .catch((err) => {
+      .catch(() => {
         setError('No se pudieron cargar los roles.');
       });
   }, []);
@@ -57,7 +57,7 @@ const AgregarUsuario = () => {
         rol_id: data.rol,
       };
 
-      const response = await AxiosInstance.post('usuarios/', userData);
+      await AxiosInstance.post('usuarios/', userData);
       const message = `El usuario ${data.nombre_usuario} fue creado exitosamente.`;
       setSuccessMessage(message);
       setError('');

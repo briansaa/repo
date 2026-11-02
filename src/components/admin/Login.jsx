@@ -4,7 +4,7 @@ import {
   Box, Alert, Grid, Link
 } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import AxiosInstance from '../Axios';
 
 const Login = () => {
   const [correo, setCorreo] = useState('');
@@ -18,7 +18,7 @@ const Login = () => {
     setMessage('');
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/token/', {
+      const response = await AxiosInstance.post('token/', {
         correo,
         password: contraseña,
       });
@@ -43,7 +43,6 @@ const Login = () => {
 
       navigate('/home');
     } catch (error) {
-      console.error('Login error:', error);
       const err =
         error?.response?.data?.detail ||
         error?.response?.data?.error ||
