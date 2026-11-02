@@ -42,26 +42,14 @@ const HistorialIA = () => {
   }, [message]);
 
   const columns = [
+    { accessorKey: 'nombre_usuario', header: 'Usuario', size: 140 },
+    { accessorKey: 'mensaje_usuario', header: 'Pregunta', size: 260 },
+    { accessorKey: 'respuesta_ia', header: 'Respuesta de la IA', size: 320 },
     {
-      accessorKey: 'nombre_usuario', // Mostrar nombre del usuario
-      header: 'Usuario',
-      size: 150,
-    },
-    {
-      accessorKey: 'prompt',
-      header: 'Prompt',
-      size: 200,
-    },
-    {
-      accessorKey: 'imagen_generada',
-      header: 'Imagen Generada',
-      size: 250,
-      Cell: ({ cell }) => <a href={cell.getValue()} target="_blank" rel="noopener noreferrer">Ver Imagen</a>,
-    },
-    {
-      accessorKey: 'fecha_generacion',
-      header: 'Fecha Generación',
-      size: 180,
+      accessorKey: 'fecha',
+      header: 'Fecha',
+      size: 170,
+      Cell: ({ cell }) => new Date(cell.getValue()).toLocaleString('es-PE'),
     },
   ];
 

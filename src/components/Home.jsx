@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import AxiosInstance from './Axios';
 import { 
   Box, Typography, Button, Grid, Card, CardContent, CardActions, CardMedia, 
   Container, Chip, IconButton, Avatar, Paper
@@ -34,7 +35,19 @@ import {
   AreaChart
 } from 'recharts';
 
+const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
 const Home = () => {
+  // Datos reales de la API (antes eran números fijos de ejemplo)
+  const [usuarios, setUsuarios] = useState([]);
+  const [tareas, setTareas] = useState([]);
+
+  useEffect(() => {
+    Promise.all([AxiosInstance.get('usuarios/'), AxiosInstance.get('tareas/')])
+      .then(([u, t]) => { setUsuarios(u.data); setTareas(t.data); })
+      .catch(() => {});
+  }, []);
+
   const features = [
     {
       title: 'Diseños Personalizados',
@@ -80,29 +93,40 @@ const Home = () => {
     },
   ];
 
-  // Datos para el gráfico de usuarios y tareas
-  const userTaskData = [
-    { mes: 'Ene', usuarios: 45, tareas: 120, completadas: 98 },
-    { mes: 'Feb', usuarios: 52, tareas: 145, completadas: 132 },
-    { mes: 'Mar', usuarios: 48, tareas: 165, completadas: 148 },
-    { mes: 'Abr', usuarios: 61, tareas: 180, completadas: 167 },
-    { mes: 'May', usuarios: 75, tareas: 210, completadas: 195 },
-    { mes: 'Jun', usuarios: 88, tareas: 240, completadas: 225 }
-  ];
+  // Tareas por mes de vencimiento (últimos 6 meses)
+  const userTaskData = useMemo(() => {
+    const hoy = new Date();
+    return Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(hoy.getFullYear(), hoy.getMonth() - 5 + i, 1);
+      const delMes = tareas.filter((t) => {
+        const f = new Date(`${t.fecha_vencimiento}T00:00:00`);
+        return f.getFullYear() === d.getFullYear() && f.getMonth() === d.getMonth();
+      });
+      return {
+        mes: MESES[d.getMonth()],
+        usuarios: new Set(delMes.map((t) => t.usuario)).size,
+        tareas: delMes.length,
+        completadas: delMes.filter((t) => t.completada).length,
+      };
+    });
+  }, [tareas]);
 
-  // Datos para el gráfico de pastel de estados de tareas
+  // Estado de las tareas
+  const hoyISO = new Date().toISOString().slice(0, 10);
+  const completadas = tareas.filter((t) => t.completada).length;
+  const vencidas = tareas.filter((t) => !t.completada && t.fecha_vencimiento < hoyISO).length;
   const taskStatusData = [
-    { name: 'Completadas', value: 965, color: '#10b981' },
-    { name: 'En Progreso', value: 324, color: '#3b82f6' },
-    { name: 'Pendientes', value: 156, color: '#f59e0b' },
-    { name: 'Canceladas', value: 45, color: '#ef4444' }
+    { name: 'Completadas', value: completadas, color: '#10b981' },
+    { name: 'Pendientes', value: tareas.length - completadas - vencidas, color: '#3b82f6' },
+    { name: 'Vencidas', value: vencidas, color: '#ef4444' },
   ];
 
+  const tasa = tareas.length ? Math.round((completadas / tareas.length) * 100) : 0;
   const stats = [
-    { value: '1,490', label: 'Total Tareas', color: '#3b82f6' },
-    { value: '88', label: 'Usuarios Activos', color: '#10b981' },
-    { value: '65%', label: 'Tasa Completada', color: '#f59e0b' },
-    { value: '24/7', label: 'Soporte', color: '#ef4444' }
+    { value: tareas.length.toLocaleString('es-PE'), label: 'Total Tareas', color: '#3b82f6' },
+    { value: usuarios.length.toLocaleString('es-PE'), label: 'Usuarios', color: '#10b981' },
+    { value: `${tasa}%`, label: 'Tasa Completada', color: '#f59e0b' },
+    { value: vencidas.toLocaleString('es-PE'), label: 'Tareas Vencidas', color: '#ef4444' },
   ];
 
   const CustomTooltip = ({ active, payload, label }) => {

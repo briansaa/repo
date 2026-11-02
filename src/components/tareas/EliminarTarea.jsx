@@ -19,7 +19,7 @@ const EliminarTarea = () => {
       try {
         const response = await AxiosInstance.get(`tareas/${id}/`);
         setTarea(response.data);
-      } catch (error) {
+      } catch {
         setError('Error al obtener la tarea');
       }
     };
@@ -32,7 +32,7 @@ const EliminarTarea = () => {
       navigate('/tareas', {
         state: { message: `La tarea "${tarea.titulo}" fue eliminada correctamente.` },
       });
-    } catch (error) {
+    } catch {
       setError('Error al eliminar la tarea.');
     }
   };
